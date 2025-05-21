@@ -20,6 +20,7 @@ Overall:
 Admin:
 1. View system logs fails.
 2. Edit button needs rework. Not clear which row it is editing.
+3. Should not be able to edit self in manage users.
 
 Executive:
 1. If they have made a deletion request, their username should not appear in their deletion requests table
@@ -28,6 +29,7 @@ Executive:
 
 
 BUGS:
-1. When editing your own username, it will bug and would need to login then logout again.
-2. Bug ib Account Setting in Profile Menu.
+1. Editing own username in manage users, bug.
+2. Manage users in general is a bug fest.
+
 

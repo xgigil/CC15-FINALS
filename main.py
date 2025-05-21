@@ -241,16 +241,22 @@ class RegisterWindow(QWidget):
                 connection.start_transaction()
 
                 # Insert into accounts table with Pending status
-                account_query = """INSERT INTO accounts (username, password, role, status) 
-                                VALUES (%s, %s, %s, 'Pending')"""
-                cursor.execute(account_query, (un, hashed_password, role))
-                user_id = cursor.lastrowid
+                if role != "Admin":
+                    account_query = """INSERT INTO accounts (username, password, role, status) 
+                                    VALUES (%s, %s, %s, 'Pending')"""
+                    cursor.execute(account_query, (un, hashed_password, role))
+                    user_id = cursor.lastrowid
+                else:
+                    account_query = """INSERT INTO accounts (username, password, role, status) 
+                                    VALUES (%s, %s, %s, 'Active')"""
+                    cursor.execute(account_query, (un, hashed_password, role))
+                    user_id = cursor.lastrowid
 
-                # Insert into profiles table - removed status field
-                profile_query = """INSERT INTO profiles 
-                    (user_id, first_name, middle_name, last_name) 
-                    VALUES (%s, %s, %s, %s)"""
-                cursor.execute(profile_query, (user_id, fn, mn, ln))
+                    # Insert into profiles table - removed status field
+                    profile_query = """INSERT INTO profiles 
+                        (user_id, first_name, middle_name, last_name) 
+                        VALUES (%s, %s, %s, %s)"""
+                    cursor.execute(profile_query, (user_id, fn, mn, ln))
 
                 # Create confirmation request for non-admin accounts
                 if role != "Admin":
@@ -394,6 +400,9 @@ class BaseDashboard(QMainWindow):
                     username_input = QLineEdit(account['username'])
                     layout.addRow("Username:", username_input)
 
+                    #New username field
+
+
                     # Current password field
                     current_password = QLineEdit()
                     current_password.setEchoMode(QLineEdit.EchoMode.Password)
@@ -453,6 +462,8 @@ class BaseDashboard(QMainWindow):
                             QMessageBox.information(edit_window, "Success", 
                                                 "Account updated successfully!")
                             edit_window.accept()
+
+                            self.logout()
 
                         except mysql.connector.Error as e:
                             QMessageBox.critical(edit_window, "Error", 
@@ -902,8 +913,8 @@ class AdminDashboard(BaseDashboard):
                 connection.start_transaction()
 
                 # Insert account
-                account_query = """INSERT INTO accounts (username, password, role)
-                                VALUES (%s, %s, %s)"""
+                account_query = """INSERT INTO accounts (username, password, role, status)
+                                VALUES (%s, %s, %s, 'Active')"""
                 cursor.execute(account_query, (
                     fields['username'].text(),
                     hashed_password,
@@ -913,8 +924,8 @@ class AdminDashboard(BaseDashboard):
 
                 # Insert profile
                 profile_query = """INSERT INTO profiles 
-                    (user_id, first_name, middle_name, last_name, status)
-                    VALUES (%s, %s, %s, %s, 'Active')"""
+                    (user_id, first_name, middle_name, last_name)
+                    VALUES (%s, %s, %s, %s)"""
                 cursor.execute(profile_query, (
                     user_id,
                     fields['first_name'].text().upper(),
