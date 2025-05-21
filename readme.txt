@@ -19,7 +19,7 @@ Overall:
 
 Admin:
 1. View system logs fails.
-2. Edit button needs rework. Not clear which row it is editing.
+2. Edit button needs rework in manage users. Not clear which row it is editing.
 3. Should not be able to edit self in manage users.
 
 Executive:
@@ -29,7 +29,14 @@ Executive:
 
 
 BUGS:
-1. Editing own username in manage users, bug.
+1. Editing own username in manage users (should not be allowed), bug.
 2. Manage users in general is a bug fest.
+3. When approving deletion, it says request no longer valid
+4. Tables should not be clickable.
+
+Cursor questions nga wala pa nako na ask:
+1. could you, edit the def approve_registration so that everytime it approves the account deletion, the account details are deleted from the database. make sure also that the account delection rejection function works by rejecting the deletion.
+2. Add logging for these deletion operations. (not sure if should ask)
+3. Add the ability to restore recently deleted accounts. (not sure if should ask)
 
 

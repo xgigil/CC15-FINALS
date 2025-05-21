@@ -14,40 +14,33 @@ from config import verify_role_password
 
 def connect_to_database(parent=None):
     try:
-        print("Attempting database connection...")  # Debug print
         connection_params = {
             "host": "localhost",
             "user": "root",
             "password": "Looking@11072004",
             "database": "users",
             "port": 3306,
-            "charset": 'utf8mb4',
             "use_pure": True  # Use pure Python implementation
         }
         
         try:
-            print("Connecting to database with params:", connection_params)  # Debug print
             connection = mysql.connector.connect(**connection_params)
             
             if connection.is_connected():
-                print("Successfully connected to database!")  # Debug print
                 cursor = connection.cursor()
                 cursor.execute("SELECT VERSION()")
                 db_version = cursor.fetchone()
-                print(f"Database version: {db_version[0]}")  # Debug print
                 cursor.close()
                 return connection
                 
         except Error as e:
             error_msg = f"Database connection error: {str(e)}"
-            print(error_msg)  # Debug print
             if parent:
                 QMessageBox.critical(parent, "Database Error", error_msg)
             return None
                 
     except Exception as e:
         error_msg = f"Unexpected error: {str(e)}"
-        print(error_msg)  # Debug print
         if parent:
             QMessageBox.critical(parent, "Error", error_msg)
         return None
@@ -75,7 +68,6 @@ def execute_query(parent, query, params=None):
 class WelcomeWindow(QWidget):
     def __init__(self):
         super().__init__()
-        print("Initializing WelcomeWindow")  # Debug print
         self.setWindowTitle("Organization Profiling System")
         self.setGeometry(100, 100, 400, 200)
         self.setup_ui()
@@ -118,12 +110,9 @@ class WelcomeWindow(QWidget):
         button_layout.addWidget(register_button)
         
         layout.addLayout(button_layout)
-        
-        print("WelcomeWindow UI setup complete")  # Debug print
 
     def login(self):
         try:
-            print("Login attempt started")  # Debug print
             username = self.username_input.text().strip()
             password = self.password_input.text()
             
@@ -150,7 +139,6 @@ class WelcomeWindow(QWidget):
                     return
                     
                 user_id, stored_hash, role, status = result
-                print(f"Found user: {username}, role: {role}, status: {status}")  # Debug print
                 
                 if status == 'Pending':
                     QMessageBox.warning(self, "Login Failed", 
@@ -187,12 +175,10 @@ class WelcomeWindow(QWidget):
                 if dashboard:
                     dashboard.show()
                     self.hide()
-                    print(f"Successfully logged in as {role}")  # Debug print
                 
             except Exception as e:
                 connection.rollback()
                 error_msg = f"Error during login: {str(e)}"
-                print(error_msg)  # Debug print
                 QMessageBox.critical(self, "Error", error_msg)
             finally:
                 cursor.close()
@@ -200,19 +186,15 @@ class WelcomeWindow(QWidget):
                 
         except Exception as e:
             error_msg = f"Unexpected error during login: {str(e)}"
-            print(error_msg)  # Debug print
             QMessageBox.critical(self, "Error", error_msg)
 
     def open_register_window(self):
         try:
-            print("Opening register window")  # Debug print
             self.register_window = RegisterWindow(self)
             self.register_window.show()
             self.hide()
-            print("Register window opened successfully")  # Debug print
         except Exception as e:
             error_msg = f"Error opening register window: {str(e)}"
-            print(error_msg)  # Debug print
             QMessageBox.critical(self, "Error", error_msg)
 
 # --- Register Window ---
@@ -263,7 +245,7 @@ class RegisterWindow(QWidget):
         
         # Role selection
         self.role_box = QComboBox()
-        self.role_box.addItems(["Member", "Executive"])
+        self.role_box.addItems(["Member", "Executive", "Admin"])
         form_layout.addRow("Role:", self.role_box)
         
         layout.addLayout(form_layout)
@@ -372,6 +354,7 @@ class RegisterWindow(QWidget):
                 connection.rollback()
                 error_msg = f"Registration error: {str(e)}"
                 print(error_msg)  # Debug print
+                logging.error(error_msg)
                 QMessageBox.critical(self, "Error", error_msg)
             finally:
                 cursor.close()
@@ -380,6 +363,7 @@ class RegisterWindow(QWidget):
         except Exception as e:
             error_msg = f"Unexpected error during registration: {str(e)}"
             print(error_msg)  # Debug print
+            logging.error(error_msg)
             QMessageBox.critical(self, "Error", error_msg)
                 
     def go_back(self):
